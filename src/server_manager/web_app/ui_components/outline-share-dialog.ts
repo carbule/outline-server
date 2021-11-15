@@ -128,6 +128,7 @@ Polymer({
       </div>
       <div id="button-row">
         <paper-button id="copyButton" on-tap="copyClicked">[[localize('share-invite-copy')]]</paper-button>
+        <paper-button id="copyButton" on-tap="copyClicked1">Copy AccessKey</paper-button>
         <paper-button id="doneButton" dialog-confirm="">[[localize('done')]]</paper-button>
       </div>
       <div id="copyText" hidden="">[[localize('share-invite-copied')]]</div>
@@ -151,6 +152,14 @@ Polymer({
     const dt = new clipboard.DT();
     dt.setData('text/plain', this.$.selectableText.innerText);
     dt.setData('text/html', this.$.selectableText.innerHTML);
+    clipboard.write(dt);
+    this.$.copyText.removeAttribute('hidden');
+  },
+
+  copyClicked1() {
+    const dt = new clipboard.DT();
+    dt.setData('text/plain', this.accessKey);
+    dt.setData('text/html', this.accessKey);
     clipboard.write(dt);
     this.$.copyText.removeAttribute('hidden');
   }
