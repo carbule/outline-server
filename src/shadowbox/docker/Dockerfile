@@ -12,25 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# 新建用户代码和上面一样
-RUN useradd --create-home --no-log-init --shell /bin/bash docker \
-&& adduser docker sudo \
-&& echo 'docker:123456' | chpasswd
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-RUN USER=outline && \
-    GROUP=outline && \
-    curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixuid-0.4.1-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
-    chown root:root /usr/local/bin/fixuid && \
-    chmod 4755 /usr/local/bin/fixuid && \
-    mkdir -p /etc/fixuid && \
-    printf "user: $USER\ngroup: $GROUP\n" > /etc/fixuid/config.yml
-
-USER outline:outline
-ENTRYPOINT ["fixuid"]
-
-# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 ARG NODE_IMAGE
 
 # Multi-stage build: use a build image to prevent bloating the shadowbox image with dependencies.
