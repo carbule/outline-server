@@ -293,7 +293,7 @@ function write_config() {
   config+=("$(printf '"hostname": "%q"' "${PUBLIC_HOSTNAME}")")
   echo "{$(join , "${config[@]}")}" > "${STATE_DIR}/shadowbox_server_config.json"
 
-  chown -R "${DOCKER_USER}" "${CONTAINER_NAME}"
+  chown -R "${DOCKER_USER}" "${SHADOWBOX_DIR}"
 }
 
 function start_shadowbox() {
@@ -548,12 +548,23 @@ function parse_flags() {
   return 0
 }
 
+random_env() {
+  local uuid="$(uuidgen)"
+  uuid="${uuid:0:8}"
+  
+  export CONTAINER_NAME="shadowbox-${uuid}"
+  export SHADOWBOX_DIR="/opt/outline-${uuid}"
+  useradd "outline-${uuid}"
+  export DOCKER_USER="$(id -u outline-${uuid})"
+}
+
 function main() {
   trap finish EXIT
   declare FLAGS_HOSTNAME=""
   declare -i FLAGS_API_PORT=0
   declare -i FLAGS_KEYS_PORT=0
   parse_flags "$@"
+  random_env
   install_shadowbox
 }
 
