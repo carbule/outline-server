@@ -39,7 +39,8 @@
 
 # Requires curl and docker to be installed
 
-# DOCKER_USER docker run user uid
+# DOCKER_USER 启动shadowbox容器的用户uid
+# SHADOWBOX_REGISTRY shadowbox注册中心地址
 
 set -euo pipefail
 
@@ -553,9 +554,17 @@ random_env() {
   uuid="${uuid:0:8}"
   
   export CONTAINER_NAME="shadowbox-${uuid}"
-  export SHADOWBOX_DIR="/opt/outline-${uuid}"
+  export SHADOWBOX_DIR="/opt/outline-gw/${uuid}"
   useradd "outline-${uuid}"
   export DOCKER_USER="$(id -u outline-${uuid})"
+}
+
+register_shadowbox() {
+  if [ -n "${SHADOWBOX_REGISTRY:-}" ]; then
+    echo "Register shadowbox to the registry: ${SHADOWBOX_REGISTRY}."
+    fetch --insecure -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"apiUrl\":\"$(get_field_value apiUrl)\",\"certSha256\":\"$(get_field_value certSha256)\"}" "${SHADOWBOX_REGISTRY}"
+    echo ""
+  fi
 }
 
 function main() {
@@ -566,6 +575,7 @@ function main() {
   parse_flags "$@"
   random_env
   install_shadowbox
+  register_shadowbox
 }
 
 main "$@"
